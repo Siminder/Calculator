@@ -45,6 +45,65 @@ table {
 	border-spacing: 0;
 }
 
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 100px;
+}
 
 
+.container{
+    display: flex;
+    border: 1px solid black;
+    width: 450px;
+    height: 650px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+}
+
+
+.display{
+    border: 1px solid black;
+    width: 400px;
+    height: 90px;
+    margin-bottom: 20px;
+    justify-content: end;
+    display: flex;
+    
+}
+
+.display span{
+    align-self: flex-end;
+    font-size: 50px;
+}
+.buttons {
+    border: 1px solid black;
+    width: 400px;
+    height: 450px;
+    display: flex;
+    flex-wrap: wrap;
+   
+}
+
+button{
+    font-size: 20px;
+    width: 80px;
+    height: 70px;
+  padding: 10px;
+  margin: 10px;
+  border: none;
+  /* background-color: #f69906; */
+  color: black;
+  cursor: pointer;
+  border-radius: 5px;
+  border-radius: 10px;
+  flex: 0 0 auto;
+}
+
+.zero{
+    flex-grow: 1;
+}
 
