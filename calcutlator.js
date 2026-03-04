@@ -1,74 +1,68 @@
 
 // GLobal Variable \
-let firstOperator = "";
-let secondOperator = "";
-let firstNumber = "";
-let secondNumber = ""
-let Num = ""; 
-let Operator =  "/";
+let currentNumber = "";
+let previousNumber = "";
+let operator = "";
+
+
+//creating a span 
+ const span = document.createElement("span");
 
 
 // Calculator Functions 
-let Add = (Num1, Num2, total) => {
-    total = Num1 + Num2;
-    span.textContent = total;
-    firstNumber = total;
-}
 
-let Subtract = (Num1, Num2, total) => {
-    total  = Num1 - Num2;
-    span.textContent = total;
-    firstNumber = total;
-}
-
-//
-let Mutiply = (Num1, Num2, total) => {
-    total = Num1 * Num2;
-    span.textContent = total;
-    firstNumber = total;
-}
+let Calculation = (operator, currentNumber, previousNumber) => {
+    let num1 = Number(currentNumber);
+    let num2 = Number(previousNumber);
+    let result;
 
 
-let Divide = (Num1, Num2) => {
-    total = Num1/Num2
-    span.textContent = total;
-    firstNumber = total;
-}
+    console.log(num1, num2)
 
-
-//function thtat takes an operator and decide what function to use 
-let Operate = (Operator, Num1, Num2) =>{
-    Num1 = Number(firstNumber);
-    Num2 = Number(secondNumber);
-    console.log(Num1, Num2)
-    if(Operator === "+"){
-        Add(Num1, Num2);
-    } else if(Operator === "-"){
-        Subtract(Num1, Num2);
-    } else if(Operator === "*"){
-        Mutiply(Num1,Num2);
-    } else if(Operator === "/"){
-        Divide(Num1, Num2)
-    } else {
-        alert("please enter a vaild operator")
+   switch (operator) {
+        case "+":
+            result = num1 + num2;
+            break;
+        case "-":
+            result = num1 - num2;
+            break;
+        case "*":
+            result = num1 * num2;
+            break;
+        case "/":
+            if (num2 === 0) {
+                result = "Error"; // Avoid dividing by zero
+            } else {
+                result = num1 / num2;
+            }
+            break;
+        default:
+            return;
     }
 
+    
+    display.textContent = result;
+    previousNumber = result;
+    currentNumber = " ";
+    operator = ""
 
 }
 
-let addOperator = (Operator) => {
-    if(!firstNumber){
-        console.log(Num)
-        firstOperator += Operator;
-        firstNumber = Num;
-        Num = "";
-    } else {
-         console.log("Num")
-         secondNumber = Num
-         secondOperator += Operator;
-         Num = "";
+
+let handleOperator = (newOperator) => {
+    if(currentNumber === ""){
+        return;
+    } 
+
+    if(previousNumber !== ""){
+        Calculation(operator, currentNumber, previousNumber);
     }
+
+    previousNumber = currentNumber;
+    operator = newOperator;
+    currentNumber = ""; 
 }
+
 
 
 
@@ -94,68 +88,71 @@ const btnZero = document.querySelector("#Zero");
 const btnDecimal = document.querySelector("#Decimal");
 
 
-//creating a span 
- const span = document.createElement("span");
-
-
 
 //Numbers on calculator 
 btnOne.addEventListener("click", () =>{
-    Num += "1";
-    span.textContent += "1"
+    currentNumber += "1";
+    span.textContent = currentNumber
     display.appendChild(span);
 })
 
 btnTwo.addEventListener("click", () =>{
-    Num += "2";
-    span.textContent += "2"
+    currentNumber += "2";
+    span.textContent = currentNumber
     display.appendChild(span)
 })
 
 
 btnThree.addEventListener("click", () =>{
-    span.textContent += "3"
+    currentNumber += "3"
+    span.textContent = currentNumber
     display.appendChild(span)
 })
 
 
 btnFour.addEventListener("click", () =>{
-    span.textContent += "4"
+    currentNumber += "4"
+    span.textContent = currentNumber
     display.appendChild(span)
 })
 
 
 btnFive.addEventListener("click", () =>{
-    span.textContent += "5"
+    currentNumber += "5"
+    span.textContent = currentNumber
     display.appendChild(span)
 })
 
 
 btnSix.addEventListener("click", () =>{
-    span.textContent += "6"
+    currentNumber += "6"
+    span.textContent = currentNumber
     display.appendChild(span)
 })
 
 
 btnSeven.addEventListener("click", () =>{
-    span.textContent += "7"
+    currentNumber += "7"
+    span.textContent = currentNumber
     display.appendChild(span)
 })
 
 
 btnEight.addEventListener("click", () =>{
-    span.textContent += "8"
+    currentNumber += "8"
+    span.textContent = currentNumber
     display.appendChild(span)
 })
 
 
 btnNine.addEventListener("click", () =>{
-    span.textContent += "9"
+    currentNumber += "9"
+    span.textContent = currentNumber
     display.appendChild(span)
 })
 
 btnDecimal.addEventListener("click", () => {
-    span.textContent += "."
+    span.textContent = "."
     display.appendChild(span)
 })
 
@@ -163,15 +160,14 @@ btnDecimal.addEventListener("click", () => {
 //operation on calcualtor 
 btnAddButton.addEventListener("click", () => {
     span.textContent += "+";
-    Operator = "+";
-    addOperator("+");
-    display.appendChild(span)
+    handleOperator("+")
+    
+    
 
 })
 
 btnEqual.addEventListener("click", () => {
-    addOperator("=");
-    Operate(Operator, firstNumber, secondNumber);
+    Calculation(operator, currentNumber, previousNumber);
 })
 
 
