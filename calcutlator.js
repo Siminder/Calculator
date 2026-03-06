@@ -1,178 +1,203 @@
-
-// GLobal Variable \
-let currentNumber = "";
+// ============================================================
+// GLOBAL STATE
+// ============================================================
+let currentNumber  = "";
 let previousNumber = "";
-let operator = "";
+let operator       = "";
+let result         = null;
+let justCalculated = false; // tracks if "=" was just pressed
 
 
-//creating a span 
- const span = document.createElement("span");
+// ============================================================
+// GRAB DOM ELEMENTS  (IDs match your HTML exactly)
+// NOTE: Your HTML has a typo — id="Mutiply" not "Multiply"
+//       We match it here so it actually works.
+// ============================================================
+const display         = document.querySelector("#display");
+const btnAC           = document.querySelector("#AC");
+const btnDelete       = document.querySelector("#Delete");
+const btnDivide       = document.querySelector("#Divide");
+const btnMultiply     = document.querySelector("#Mutiply");   // typo in your HTML — matched here
+const btnSubtract     = document.querySelector("#Subtract");
+const btnAdd          = document.querySelector("#Add");
+const btnEqual        = document.querySelector("#Equal");
+const btnDecimal      = document.querySelector("#Decimal");
+const btnZero         = document.querySelector("#Zero");
+const btnOne          = document.querySelector("#btnOne");    // your HTML uses "btnOne" not "One"
+const btnTwo          = document.querySelector("#Two");
+const btnThree        = document.querySelector("#Three");
+const btnFour         = document.querySelector("#Four");
+const btnFive         = document.querySelector("#Five");
+const btnSix          = document.querySelector("#Six");
+const btnSeven        = document.querySelector("#Seven");
+const btnEight        = document.querySelector("#Eight");
+const btnNine         = document.querySelector("#Nine");
 
 
-// Calculator Functions 
+// ============================================================
+// UPDATE DISPLAY — one single function controls what shows
+// ============================================================
+function updateDisplay() {
+    if (currentNumber !== "") {
+        display.textContent = currentNumber;
+    } else if (previousNumber !== "") {
+        display.textContent = previousNumber + " " + operator;
+    } else {
+        display.textContent = "0";
+    }
+}
 
-let Calculation = (operator, currentNumber, previousNumber) => {
-    let num1 = Number(currentNumber);
-    let num2 = Number(previousNumber);
-    let result;
+
+// ============================================================
+// HANDLE NUMBER INPUT — one function instead of 10 copies
+// ============================================================
+function handleNumber(digit) {
+    // After pressing "=", start a brand new calculation
+    if (justCalculated) {
+        previousNumber = "";
+        operator       = "";
+        justCalculated = false;
+    }
+
+    // Block a second decimal point (e.g. "12.3.5" is not allowed)
+    if (digit === "." && currentNumber.includes(".")) return;
+
+    // If decimal is first character, prefix with "0"
+    if (digit === "." && currentNumber === "") currentNumber = "0";
+
+    currentNumber += digit;
+    updateDisplay();
+}
 
 
-    console.log(num1, num2)
+// ============================================================
+// CALCULATE
+// ============================================================
+function calculate() {
+    if (previousNumber === "" || currentNumber === "" || operator === "") return;
 
-   switch (operator) {
-        case "+":
-            result = num1 + num2;
-            break;
-        case "-":
-            result = num1 - num2;
-            break;
-        case "*":
-            result = num1 * num2;
-            break;
+    let num1 = Number(previousNumber);
+    let num2 = Number(currentNumber);
+
+    switch (operator) {
+        case "+": result = num1 + num2; break;
+        case "-": result = num1 - num2; break;
+        case "*": result = num1 * num2; break;
         case "/":
-            if (num2 === 0) {
-                result = "Error"; // Avoid dividing by zero
-            } else {
-                result = num1 / num2;
-            }
+            result = num2 === 0 ? "Nice try 😈" : num1 / num2;
             break;
-        default:
-            return;
     }
 
-    
+    // Round long decimals so they don't overflow the display
+    if (typeof result === "number") {
+        result = parseFloat(result.toFixed(10));
+    }
+
     display.textContent = result;
-    previousNumber = result;
-    currentNumber = " ";
-    operator = ""
-
+    previousNumber      = String(result);
+    currentNumber       = "";
+    operator            = "";
+    justCalculated      = true;
 }
 
 
-let handleOperator = (newOperator) => {
-    if(currentNumber === ""){
+// ============================================================
+// HANDLE OPERATOR BUTTONS
+// ============================================================
+function handleOperator(newOperator) {
+    // After "=", operator works on the displayed result
+    if (justCalculated) {
+        operator       = newOperator;
+        justCalculated = false;
+        updateDisplay();
         return;
-    } 
-
-    if(previousNumber !== ""){
-        Calculation(operator, currentNumber, previousNumber);
     }
 
-    previousNumber = currentNumber;
+    // No number typed yet — just swap the operator, don't calculate
+    if (currentNumber === "") {
+        operator = newOperator;
+        updateDisplay();
+        return;
+    }
+
+    // Already have a previous number — chain: calculate first, then store new operator
+    if (previousNumber !== "") {
+        calculate();
+        justCalculated = false;
+    } else {
+        previousNumber = currentNumber;
+        currentNumber  = "";
+    }
+
     operator = newOperator;
-    currentNumber = ""; 
+    updateDisplay();
 }
 
 
+// ============================================================
+// CLEAR & DELETE
+// ============================================================
+function clearAll() {
+    currentNumber  = "";
+    previousNumber = "";
+    operator       = "";
+    result         = null;
+    justCalculated = false;
+    display.textContent = "0";
+}
+
+function deleteLast() {
+    if (justCalculated) return;                    // can't backspace a result
+    currentNumber = currentNumber.slice(0, -1);   // removes last character
+    updateDisplay();
+}
 
 
-// Grabbing all my elements
-const display = document.querySelector("#display");
-const btnOne = document.querySelector("#btnOne");
-const btnTwo = document.querySelector("#Two");
-const btnThree = document.querySelector("#Three");
-const btnFour = document.querySelector("#Four");
-const btnFive = document.querySelector("#Five");
-const btnSix = document.querySelector("#Six");
-const btnSeven = document.querySelector("#Seven");
-const btnEight = document.querySelector("#Eight");
-const btnNine = document.querySelector("#Nine");
-const btnAC = document.querySelector("#AC");
-const btnDelete = document.querySelector("#Delete");
-const btnDivideButton = document.querySelector("#Divide");
-const btnMultiplyButton = document.querySelector("#Multiply");
-const btnSubtractButton = document.querySelector("#Subtract");
-const btnAddButton = document.querySelector("#Add");
-const btnEqual = document.querySelector("#Equal");
-const btnZero = document.querySelector("#Zero");
-const btnDecimal = document.querySelector("#Decimal");
+// ============================================================
+// EVENT LISTENERS — numbers
+// ============================================================
+btnOne.addEventListener(    "click", () => handleNumber("1"));
+btnTwo.addEventListener(    "click", () => handleNumber("2"));
+btnThree.addEventListener(  "click", () => handleNumber("3"));
+btnFour.addEventListener(   "click", () => handleNumber("4"));
+btnFive.addEventListener(   "click", () => handleNumber("5"));
+btnSix.addEventListener(    "click", () => handleNumber("6"));
+btnSeven.addEventListener(  "click", () => handleNumber("7"));
+btnEight.addEventListener(  "click", () => handleNumber("8"));
+btnNine.addEventListener(   "click", () => handleNumber("9"));
+btnZero.addEventListener(   "click", () => handleNumber("0"));
+btnDecimal.addEventListener("click", () => handleNumber("."));
+
+// ============================================================
+// EVENT LISTENERS — operators
+// ============================================================
+btnAdd.addEventListener(     "click", () => handleOperator("+"));
+btnSubtract.addEventListener("click", () => handleOperator("-"));
+btnMultiply.addEventListener("click", () => handleOperator("*"));
+btnDivide.addEventListener(  "click", () => handleOperator("/"));
+
+// ============================================================
+// EVENT LISTENERS — actions
+// ============================================================
+btnEqual.addEventListener( "click", calculate);
+btnAC.addEventListener(    "click", clearAll);
+btnDelete.addEventListener("click", deleteLast);
 
 
-
-//Numbers on calculator 
-btnOne.addEventListener("click", () =>{
-    currentNumber += "1";
-    span.textContent = currentNumber
-    display.appendChild(span);
-})
-
-btnTwo.addEventListener("click", () =>{
-    currentNumber += "2";
-    span.textContent = currentNumber
-    display.appendChild(span)
-})
-
-
-btnThree.addEventListener("click", () =>{
-    currentNumber += "3"
-    span.textContent = currentNumber
-    display.appendChild(span)
-})
-
-
-btnFour.addEventListener("click", () =>{
-    currentNumber += "4"
-    span.textContent = currentNumber
-    display.appendChild(span)
-})
-
-
-btnFive.addEventListener("click", () =>{
-    currentNumber += "5"
-    span.textContent = currentNumber
-    display.appendChild(span)
-})
-
-
-btnSix.addEventListener("click", () =>{
-    currentNumber += "6"
-    span.textContent = currentNumber
-    display.appendChild(span)
-})
-
-
-btnSeven.addEventListener("click", () =>{
-    currentNumber += "7"
-    span.textContent = currentNumber
-    display.appendChild(span)
-})
-
-
-btnEight.addEventListener("click", () =>{
-    currentNumber += "8"
-    span.textContent = currentNumber
-    display.appendChild(span)
-})
-
-
-btnNine.addEventListener("click", () =>{
-    currentNumber += "9"
-    span.textContent = currentNumber
-    display.appendChild(span)
-})
-
-btnDecimal.addEventListener("click", () => {
-    span.textContent = "."
-    display.appendChild(span)
-})
-
-
-//operation on calcualtor 
-btnAddButton.addEventListener("click", () => {
-    span.textContent += "+";
-    handleOperator("+")
-    
-    
-
-})
-
-btnEqual.addEventListener("click", () => {
-    Calculation(operator, currentNumber, previousNumber);
-})
-
-
-
-
+// ============================================================
+// KEYBOARD SUPPORT (bonus!)
+// ============================================================
+document.addEventListener("keydown", (event) => {
+    const key = event.key;
+    if (!isNaN(key) || key === ".") handleNumber(key);
+    if (key === "+") handleOperator("+");
+    if (key === "-") handleOperator("-");
+    if (key === "*") handleOperator("*");
+    if (key === "/") { event.preventDefault(); handleOperator("/"); }
+    if (key === "Enter" || key === "=") calculate();
+    if (key === "Backspace") deleteLast();
+    if (key === "Escape") clearAll();
+});
 
 
 
